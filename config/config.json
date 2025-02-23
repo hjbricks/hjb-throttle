@@ -1,0 +1,15 @@
+{
+    "version"  : 3,
+    "hostname" : "CTRL01",
+    "wifi": { "SSID": "ssid", "password" : "password" },
+    "loglevel": "DEBUG", 
+    "mqtt"   : { "broker" : "mqtt.example.com", 
+                 "port"   : 1883,
+                 "username" : "<not used>",
+                 "password" : "<not used>", 
+                 "ebreakOnDisconnect" : false },
+    "update" : { "configUrl" : "http://192.168.178.10/esp/config/",
+                 "manifestUrl": "http://192.168.178.10/esp/firmware/manifest",
+                 "firmwareType": "esp32-rr2bricks-rrmaus"},
+    "OTAPassword" : "<OTAPassword>"
+}
