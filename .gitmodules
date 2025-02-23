@@ -1,0 +1,3 @@
+[submodule "hjb-lib"]
+	path = hjb-lib
+	url = git@gitlab.barelds.org:hjbricks1/hjb-lib.git
