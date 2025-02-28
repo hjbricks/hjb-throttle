@@ -386,7 +386,7 @@ void setup(void)
     delay(100);                   // Wait a moment to start (so we don't miss Serial output).
     logger.setup(true, LOG_INFO); // for nor LOG
 
-    logger.vlogf(LOG_INFO, "RRMaus version %s", AUTO_VERSION);
+    logger.vlogf(LOG_INFO, "hjbricks-throttle version %s", AUTO_VERSION);
     logger.log(LOG_INFO, "Started setup.");
 #ifdef HAVE240X240
     pinMode(TFT__BLK, OUTPUT);    // set pin to input

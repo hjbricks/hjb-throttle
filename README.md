@@ -1,5 +1,4 @@
-# rrmaus
-
+# hjb-throttle
 ## TODOs
 
 - [x] rewrite using locid and switchid
@@ -13,14 +12,15 @@
 - [x] working switches
 - [x] auto update the version number
 - [x] make gilab generate and upload a new firware version
-- [x] have version 1 of the pcb, fail, wemos wifi battey blue-tooth has an extrem bad usb port
-- [x] moving to an esp32 exp board with separte battery managemant board
+- [x] have version 1 of the pcb, fail, wemos wifi battey blue-tooth has an extreme bad usb port
+- [x] moving to an esp32 exp board with separate battery management board
 - [x] make pcb for version 2
 - [x] make software compatible with 240x320 and 240x240
 - [x] make pcb for version 3
 - [x] show OTA errors on screen
 - [x] allow < co /> objects to be controlled
 - [x] create 3d printable case
+- [ ] rework locomotive speed handling 
 
 
 ## How it works
@@ -76,7 +76,7 @@ In the ```platformio.ini``` there is a line ```data_dir = $PROJECT_DIR/my-data``
                  "ebreakOnDisconnect" : false },
     "update" : { "configUrl" : "http://192.168.178.10/esp/config/",
                  "manifestUrl": "http://192.168.178.10/esp/firmware/manifest",
-                 "firmwareType": "esp32-rr2bricks-rrmaus"},
+                 "firmwareType": "esp32-hjbricks-throttle"},
     "OTAPassword" : "<OTAPassword>"
   }
 ```
@@ -101,7 +101,7 @@ The ```-P <port>``` is added to fix the OTA port and make it work if your ESP is
 
 The OTAPassword in ```my_platformio.ini``` and the uploaded ```config``` file need to be the same in order to have OTA firmware and config updates work. 
 
-## auto versioning the firmare
+## auto versioning the firmware
 
-The script ```../bin/auto_firmware_version.py```, defines the ```AUTO_VERSION``` variable and is filed with the content of ```git describe```. It is known to work on Windows 11, MacOS and Linux, your probably need to install Git for windows! 
+The script ```../hjb-bin/bin/auto_firmware_version.py```, defines the ```AUTO_VERSION``` variable and is filed with the content of ```git describe```. It is known to work on Windows 11, MacOS and Linux, your probably need to install Git for windows! 
  

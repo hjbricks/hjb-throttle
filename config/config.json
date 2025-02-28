@@ -10,6 +10,6 @@
                  "ebreakOnDisconnect" : false },
     "update" : { "configUrl" : "http://192.168.178.10/esp/config/",
                  "manifestUrl": "http://192.168.178.10/esp/firmware/manifest",
-                 "firmwareType": "esp32-rr2bricks-rrmaus"},
+                 "firmwareType": "esp32-hjbricks-throttle"},
     "OTAPassword" : "<OTAPassword>"
 }
