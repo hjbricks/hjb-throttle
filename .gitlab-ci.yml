@@ -22,7 +22,8 @@ build-throttle:
     - export GIT_DESC=$(git describe)
     - export arrV=(${GIT_DESC//-/ })
     - export VERSION=${arrV[0]}-${arrV[1]}
-  script: 
+  script:
+    - find .
     - pio run -e esp32doit-devkit-v1
     - cp .pio/build/esp32doit-devkit-v1/firmware.bin esp32-hjb-throttle.bin
   artifacts:
