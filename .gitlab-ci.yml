@@ -1,0 +1,62 @@
+image: python:3.10
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.pip-cache"
+
+cache:
+  paths:
+    - .pip-cache/
+
+stages:
+   - build
+   - deploy-dev
+ 
+build-throttle:
+  tags:
+    - platformio
+  stage: build
+  before_script:
+    - pip install -U platformio
+    - export GIT_DESC=$(git describe)
+    - export arrV=(${GIT_DESC//-/ })
+    - export VERSION=${arrV[0]}-${arrV[1]}
+  script: 
+    - pio run -e esp32doit-devkit-v1
+    - cd ../..
+    - cp .pio/build/esp32doit-devkit-v1/firmware.bin esp32-hjb-throttle.bin
+  artifacts:
+    paths:
+    - esp32-hjb-throttle.bin
+    expire_in: 1 week
+
+deploy-dev:
+  tags:
+    - platformio
+  stage: deploy-dev
+  dependencies:
+    - build-rr
+  except:
+    - master
+    - release
+  before_script:
+    - apk update && apk add openssh-client bash rsync
+    - eval $(ssh-agent -s)
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - eval "$(ssh-agent -s)"
+    - ssh-add ~/.ssh/id_rsa
+    - echo "${SSH_HOST_KEY}" > ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+    - export GIT_DESC=$(git describe)
+    - export arrV=(${GIT_DESC//-/ })
+    - export VERSION=${arrV[0]}-${arrV[1]}
+  script: 
+    - if [ "$VERSION" == "-" ]; then export VERSION="0"; fi
+    - scp esp32-hjb-throttle.bin ${WWW_ROOT}/esp/firmware/esp32-hjb-throttle-${VERSION}.bin
+    - echo $VERSION # Do something with this variable
+    - scp ${WWW_ROOT}/esp/firmware/manifest .
+    - echo "esp32-hjb-throttle, "$VERSION", $HTTP_ROOT"esp/firmware/esp32-hjb-throttle-"$VERSION".bin >> ./manifest
+manifest
+    - scp manifest ${WWW_ROOT}/esp/firmware
