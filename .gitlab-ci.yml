@@ -34,7 +34,7 @@ deploy-dev:
     - platformio
   stage: deploy-dev
   dependencies:
-    - build-rr
+    - build-throttle
   except:
     - master
     - release
@@ -58,5 +58,5 @@ deploy-dev:
     - echo $VERSION # Do something with this variable
     - scp ${WWW_ROOT}/esp/firmware/manifest .
     - echo "esp32-hjb-throttle, "$VERSION", $HTTP_ROOT"esp/firmware/esp32-hjb-throttle-"$VERSION".bin >> ./manifest
-manifest
+manifest:
     - scp manifest ${WWW_ROOT}/esp/firmware
