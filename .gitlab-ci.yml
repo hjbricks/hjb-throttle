@@ -23,7 +23,6 @@ build-throttle:
     - export arrV=(${GIT_DESC//-/ })
     - export VERSION=${arrV[0]}-${arrV[1]}
   script:
-    - find .
     - pio run -e esp32doit-devkit-v1
     - cp .pio/build/esp32doit-devkit-v1/firmware.bin esp32-hjb-throttle.bin
   artifacts:
@@ -41,7 +40,7 @@ deploy-dev:
     - master
     - release
   before_script:
-    - apk update && apk add openssh-client bash rsync
+    - apt-get update -y && apt-get install openssh-client bash rsync -y
     - eval $(ssh-agent -s)
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
