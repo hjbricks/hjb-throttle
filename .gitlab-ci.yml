@@ -24,7 +24,6 @@ build-throttle:
     - export VERSION=${arrV[0]}-${arrV[1]}
   script: 
     - pio run -e esp32doit-devkit-v1
-    - cd ../..
     - cp .pio/build/esp32doit-devkit-v1/firmware.bin esp32-hjb-throttle.bin
   artifacts:
     paths:
