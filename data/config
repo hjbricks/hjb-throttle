@@ -1,0 +1,8 @@
+<hostname>
+<wifi ssid>
+<wifi password>
+<mqtt server>
+<mqtt port>
+<mqtt user>
+<mqtt password>
+<log level: DEBUG, INFO, WARNING, ERROR, FATAL; default is ERROR>

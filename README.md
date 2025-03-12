@@ -1,93 +1,107 @@
 # hjb-throttle
+## TODOs
+
+- [x] rewrite using locid and switchid
+- [x] have fn's showing
+- [x] handle mqtt fn
+- [x] have fn's working
+- [x] have stop working
+- [x] OTA updates
+- [x] working speed update
+- [x] have direction working
+- [x] working switches
+- [x] auto update the version number
+- [x] make gilab generate and upload a new firware version
+- [x] have version 1 of the pcb, fail, wemos wifi battey blue-tooth has an extreme bad usb port
+- [x] moving to an esp32 exp board with separate battery management board
+- [x] make pcb for version 2
+- [x] make software compatible with 240x320 and 240x240
+- [x] make pcb for version 3
+- [x] show OTA errors on screen
+- [x] allow < co /> objects to be controlled
+- [x] create 3d printable case
+- [ ] rework locomotive speed handling 
 
 
+## How it works
 
-## Getting started
+This is a Rocrail&reg; throttle.
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+The code is based on sending asynchronous mqtt messages to and get a response from Rocrail&reg;.
+Changes are send to Rocrail&reg; and the response is displayed.
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+**You need at least RocRail&reg version 2.1.4368** otherwise not everything (almost nothing) works.
 
-## Add your files
+The four menu buttons under the display do:
+ - (1) select the locomotives 
+ - (2) select a output or signals by pressing this button and rotate the button
+ - (3) ebreak
+ - (4) select the switches
+If both 'select the locomotives' and 'select the switches' are pressed for 4 seconds, then the ESP will restart.
+Holding the output button (2) and simultaneous rotating the button, you are able to select outputs and blocks.
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+The other six buttons from top to button
+ - stop locomotive/flip switch
+ - shift the function groups, the green circles on the screen represent the current selected group
+ - f0
+ - f1, f5, f9 or f13 depending on the group.
+ - f2, f6, f10 or f14
+ - f3, f7, f11 or f15
+ - f4, f8, f12 or f16
+
+ If you press the rotary button you can select either a locomotive or a switch. After pressing the rotary button again, you select the the item you want to control.
+
+ By rotating the button in train mode, you can vary the speed of the locomotive.
+
+ In the switch mode it shows the selected switch and it stage (the same as in Rocrail&reg;). For now the switch is in its default position and not as it is placed in the layout.
+  
+## configuration
+
+The configuration is a binary generated file from a json file, why binary, it loads easier and there is no json library overhead.
+Please make a copy of the config directory, to something like my-config and also make a my-data directory. When executing the command 
+```python3.exe ..\bin\convert-json-bin.py --src .\my-config\config.json --dest .\my-data``` it converts the config.json file to binary files and stores them in my-data.
+
+In the ```platformio.ini``` there is a line ```data_dir = $PROJECT_DIR/my-data```, this line is used by "Upload Filesystem Image" and "Upload Filesystem Image OTA".
 
 ```
-cd existing_repo
-git remote add origin https://gitlab.barelds.org/hjbricks1/hjb-throttle.git
-git branch -M master
-git push -uf origin master
+  {
+    "version"  : 3,
+    "hostname" : "<hostname>",
+    "wifi": { "SSID": "<ssid>", "password" : "<password>" },
+    "loglevel": "DEBUG|INFO|WARNING|ERROR|FATAL", 
+    "mqtt"   : { "broker" : "<mqtt.example.com>", 
+                 "port"   : 1883,
+                 "username" : "<not used>",
+                 "password" : "<not used>", 
+                 "ebreakOnDisconnect" : false },
+    "update" : { "configUrl" : "http://192.168.178.10/esp/config/",
+                 "manifestUrl": "http://192.168.178.10/esp/firmware/manifest",
+                 "firmwareType": "esp32-hjbricks-throttle"},
+    "OTAPassword" : "<OTAPassword>"
+  }
 ```
+If you don't have a webserver (can be local) or do not want to auto update, leave ```configUrl``` and ```manifestUrl``` empty.
 
-## Integrate with your tools
+The config file should speak for itself, change it to values that work for you.
 
-- [ ] [Set up project integrations](https://gitlab.barelds.org/hjbricks1/hjb-throttle/-/settings/integrations)
+## platformio.ini, my_platformio.ini
 
-## Collaborate with your team
+Copy the ```my_platformio.ini.example``` to ```my_platformio.ini``` and change the values to make it work for you:
+```
+[env:esp32doit-devkit-v1_ota]
+upload_port = <hostname>
+upload_flags = 
+  --auth=<OTAPassword>
+  -P <OTA Port, needed for firewalls>
+```
+If you add values in my_platformio.ini that are also in platform.ini, I don't know what values are used, so take care!
+The ```-P <port>``` is added to fix the OTA port and make it work if your ESP is in an other VLAN as your development host and have a firewall in between. Make sure that that port is open on both networks, otherwise it will not work!
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+## OTA password
 
-## Test and Deploy
+The OTAPassword in ```my_platformio.ini``` and the uploaded ```config``` file need to be the same in order to have OTA firmware and config updates work. 
 
-Use the built-in continuous integration in GitLab.
+## auto versioning the firmware
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
-
-***
-
-# Editing this README
-
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
-
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
-
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+The script ```../hjb-bin/bin/auto_firmware_version.py```, defines the ```AUTO_VERSION``` variable and is filed with the content of ```git describe```. It is known to work on Windows 11, MacOS and Linux, your probably need to install Git for windows! 
+ 

@@ -1,0 +1,5 @@
+[env:esp32doit-devkit-v1_ota]
+upload_port = <hostname>
+upload_flags = 
+  --auth=<OTAPassword>
+  -P <OTA Port, needed for firewalls>
